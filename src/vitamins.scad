@@ -1,11 +1,8 @@
-module extrusion(x=20, y=20, z=extrusion_length, diff=false){
-    asm_rot = [0,0,90];
-    asm_loc = [-x/2-10-vat_stepper_gap,stepper_obj[WIDTH]-extrusion_stepper_gap,plate_thickness+foot_length];
-    rotate(asm_rot)
-    translate(asm_loc)
+module extrusion(z=extrusion_length, diff=false){
+    translate([-10,-10,0])
     color("silver"){
         if(diff) {
-            cube([x,y,z]);
+            cube([10,10,z]);
         }
         else {
             translate([10,10,0])for(i=[0:3])
@@ -23,22 +20,30 @@ module extrusion(x=20, y=20, z=extrusion_length, diff=false){
     }
 }
 
-module acme_nut(){
-    start = movement[0];
-    finish = movement[1];
-    range = finish-start;
-
-    translate([stepper_loc[0],stepper_loc[1],stepper_loc[2]-3.81+start+$t*range+stepper_obj[LENGTH]+rail_gap])
+module acme_nut(move_length=200-57,diff=false){
+    translate([stepper_loc[0],stepper_loc[1],foot_length+plate_thickness*2+base_height+rail_gap+move_length*$t])
+    rotate([0,180,0])
     color("black")
-    difference(){
+    if(!diff)
+        difference(){
+            union(){
+                cylinder(r=25.4/2, h=3.81);
+                cylinder(r=12.7/2, h=19.05);
+            }
+            for(i=[1:3]){
+                rotate([0,0,120*i])translate([19.05/2,0,-1])cylinder(r=3.56/2,h=3.81+2);
+            }
+            translate([0,0,-1])cylinder(r=4,h=19.05+2);
+        }
+    else {
         union(){
-            cylinder(r=25.4/2, h=3.81);
-            cylinder(r=12.7/2, h=19.05);
+            polyCylinder(r=25.4/2, h=3.81);
+            polyCylinder(r=12.7/2, h=19.05);
+            for(i=[1:3]){
+                rotate([0,0,120*i])translate([19.05/2,0,-30])polyCylinder(r=1,h=60);
+            }
+            translate([0,0,-50])polyCylinder(r=5,h=100);
         }
-        for(i=[1:3]){
-            rotate([0,0,120*i])translate([19.05/2,0,-1])cylinder(r=3.56/2,h=3.81+2);
-        }
-        translate([0,0,-1])cylinder(r=4,h=19.05+2);
     }
 }
 
@@ -102,7 +107,7 @@ module stepper_subasm(diff=false){
 
 //http://www.file-vault.us/pdfs/hiwinguideway.pdf
 module rail(length=200){
-    translate([-15/2+10,-vat_stepper_gap,base_height+plate_thickness*2+rail_gap])
+    translate([-15/2,0,0])
     rotate([0,0,0])
     steel(){
         linear_extrude(height=length){
@@ -115,17 +120,43 @@ module rail(length=200){
     }
 }
 
+module rail_car(move=200,diff=false){
+    translate([-34/2,24-19.5,(move-57)*$t])
+    color("green"){
+        difference(){
+            cube([34,19.5,57]);
+            if(!diff)
+                for(x_i=[0,26]) for(z_i=[0,26])
+                    translate([4+x_i,20.5,15.5+z_i])rotate([90,0,0])cylinder(r=1.5, h=5);
+        }
+    }
+}
+
+module rail_subasm(length=200){
+    rail(length=length);
+    rail_car(move=length);
+}
+
+
+
 module rambo_mini(diff=false){
-    translate([-10,-90,foot_length+plate_thickness+1])
-    rotate([0,0,30])
-    color("green")
+    translate([4,-89,foot_length+plate_thickness+72])
+    rotate([-90,0,35])
     difference(){
-        cube([105,20,71]);
-        if(diff){
+        union(){
+            color("green")cube([105,71,3]);
+            color("silver")translate([105-13,26,3])cube([16,12,11]);
+            color("black")translate([10,0,3])cube([40,71,21]);
+            if(diff){
+                translate([105-13,26,3])cube([30,12,11]);
+                translate([100,14.87,7.2,])rotate([0,90,0])polyCylinder(r=3,h=30);
+                for(x_i=[0,95]) for(y_i=[0,61])
+                    translate([5+x_i,5+y_i,-10])polyCylinder(r=1, h=20);
+            }
         }
-        else {
-            polyCylinder(r=3, h=20);
-        }
+        if(!diff)
+            for(x_i=[0,95]) for(y_i=[0,61])
+                translate([5+x_i,5+y_i,-1])cylinder(r=2, h=5);
     }
 }
 

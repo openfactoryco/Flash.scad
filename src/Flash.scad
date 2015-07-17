@@ -6,19 +6,17 @@ include <parts.scad>
 /*
 TODO
 
-- mirror mount
-- parameterize base height
-- fan mount
-- vat
-- z arm
-- z shoe
-- build plate
-- rambo mini
-- extrusion cap
-- extrusion guard (integrate with top plate)
-- electronics bottom mount
-
+- mirror mount - 1
+- fan mount - 1
+- vat - 3
+- z arm - 3
+- z shoe - 2
+- build plate - 1
+- extrusion cap - 1
+- extrusion mount - 1
+TCB
 */
+
 //Config
 area = [60*16/9,60];
 
@@ -38,7 +36,8 @@ rail_gap = 30;
 
 vat_loc = [0,5];
 
-extrusion_length = 320;
+extrusion_length = base_height+plate_thickness+rail_gap+200;
+
 
 phi = 1.618033988;
 
@@ -53,16 +52,13 @@ stepper_loc = [-stepper_obj[WIDTH]/2,-stepper_obj[WIDTH]/2-vat_stepper_gap,base_
 extrusion_stepper_gap = stepper_obj[WIDTH] + 20;
 
 module assembly(){
-    electronics_cover();
-    base();
-    base_side();
     //top_plate();
     bottom_plate();
-    extrusion();
+    base();
+    base_side();
+    extrusion_subasm();
     acer_h6510bd();
     stepper_subasm();
-    translate([0,0,0])acme_nut();
-    rail();
     rambo_mini();
     vat_lower();
     build_plate();
@@ -70,3 +66,7 @@ module assembly(){
 }
 
 assembly();
+//base();
+//rambo_mini();
+//rail_subasm();
+//extrusion_subasm();
