@@ -170,7 +170,7 @@ module extrusion_cap(){
 
 module extrusion_guard(){
     module guard_half(){
-        translate([8,1,0])cube([4,3,rail_gap]);
+        translate([9,1,0])cube([3,2,rail_gap]);
         translate([11,1,0])cube([2,18,rail_gap]);
         translate([0,10,0])cube([12,9,rail_gap]);
     }
