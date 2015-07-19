@@ -40,7 +40,7 @@ module acme_nut(move_length=200-57,diff=false){
             polyCylinder(r=25.4/2, h=3.81);
             polyCylinder(r=12.7/2, h=19.05);
             for(i=[1:3]){
-                rotate([0,0,120*i])translate([19.05/2,0,-30])polyCylinder(r=1,h=60);
+                rotate([0,0,120*i])translate([19.05/2,0,-20])polyCylinder(r=1,h=70);
             }
             translate([0,0,-50])polyCylinder(r=5,h=100);
         }

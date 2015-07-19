@@ -10,7 +10,6 @@ TODO
 - fan mount - 1
 - vat - 2
 - vat mount - 2
-- z arm - 3
 - z shoe - 2
 - build plate - 1
 - extrusion mount - 1
@@ -32,9 +31,10 @@ plate_thickness = 8;
 lid_height = 255;
 lid_thickness = 3;
 
+//24mm bottom to top of car
 rail_gap = 30;
 
-vat_loc = [0,5];
+vat_loc = [0,0];
 
 extrusion_length = base_height+plate_thickness+rail_gap+200;
 
@@ -45,9 +45,9 @@ phi = 1.618033988;
 movement = [5,200];
 
 stepper_type = "NEMA17_TR8X8_210mm";
-vat_stepper_gap = 20-vat_loc[1];
+vat_stepper_gap = 20;
 stepper_obj = object(stepper_type);
-stepper_loc = [-stepper_obj[WIDTH]/2,-stepper_obj[WIDTH]/2-vat_stepper_gap,base_height-stepper_obj[LENGTH]+plate_thickness+foot_length];
+stepper_loc = [-stepper_obj[WIDTH]/2-10,-34,base_height-stepper_obj[LENGTH]+plate_thickness+foot_length];
 
 module assembly(){
     //top_plate();
@@ -60,10 +60,13 @@ module assembly(){
     stepper_subasm();
     rambo_mini();
     build_tray_subasm();
-    amber_lid(); // put at end so transparency works.
+    //amber_lid(); // put at end so transparency works.
 }
 
 assembly();
+//z_arm();
+//vat_subasm();
+//base_side();
 //base();
 //rambo_mini();
 //rail_subasm();
