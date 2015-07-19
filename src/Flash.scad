@@ -7,7 +7,6 @@ include <parts.scad>
 TODO
 
 - mirror mount - 1
-- vat - 2
 - extrusion mount - 1
 TCB
 */
@@ -48,7 +47,7 @@ stepper_obj = object(stepper_type);
 stepper_loc = [-stepper_obj[WIDTH]/2-10,-34,base_height-stepper_obj[LENGTH]+plate_thickness+foot_length];
 
 module assembly(){
-    //top_plate();
+    top_plate();
     translate([0,0,0.1])bottom_plate();
     base();
     base_side();
@@ -61,7 +60,6 @@ module assembly(){
     amber_lid(); // put at end so transparency works.
 }
 
-//fan_diff();
 assembly();
 //z_arm();
 //vat_subasm();

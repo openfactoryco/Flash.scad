@@ -197,7 +197,7 @@ module amber_lid(){
     }
 }
 
-module vat_lower(r=5,size=area,wall=[15,10],tension_height=5, window_r=2,h=10){
+module vat_lower(r=5,size=area,wall=[15,15],tension_height=5, window_r=2,h=7){
     translate([-area[0]/2-wall[0],-area[1]/2-wall[1],0])
     color("orange"){
         difference(){
@@ -219,6 +219,18 @@ module vat_lower(r=5,size=area,wall=[15,10],tension_height=5, window_r=2,h=10){
             minkowski(){
                 translate([wall[0],wall[1],0])cube([area[0],area[1],h]);
                 translate([0,0,-0.5])cylinder(r=2,h=10);
+            }
+            for(i=[0:5])translate([wall[0]/2-1+(area[0]+wall[0]+2)*i/5,0,0]){
+                translate([0,wall[1]/2-1,-1])
+                    polyCylinder(r=1,h=h+2);
+                translate([0,wall[1]*3/2+area[1]+1,-1])
+                    polyCylinder(r=1,h=h+2);
+            }
+            for(i=[0:4])translate([0,wall[1]/2-1+(area[1]+wall[1]+2)*i/4,0]){
+                translate([wall[0]/2-1,0,-1])
+                    polyCylinder(r=1,h=h+2);
+                translate([wall[0]*3/2+area[0]+1,0,-1])
+                    polyCylinder(r=1,h=h+2);
             }
         }
     }
@@ -244,11 +256,34 @@ module vat_upper(r=5,size=area,wall=[15,10],tension_height=5, window_r=2,h=17){
                 translate([wall[0],wall[1],0])cube([area[0],area[1],h]);
                 translate([0,0,-0.5])cylinder(r=2,h=10);
             }
-            hull(){
-                translate([wall[0]-2,wall[1]-2,0])cylinder(r1=tension_height-2,r2=0,h=tension_height-2);
-                translate([wall[0]-2,wall[1]+2+area[1],0])cylinder(r1=tension_height-2,r2=0,h=tension_height-2);
-                translate([wall[0]+2+area[0],wall[1]-2,0])cylinder(r1=tension_height-2,r2=0,h=tension_height-2);
-                translate([wall[0]+2+area[0],wall[1]+2+area[1],0])cylinder(r1=tension_height-2,r2=0,h=tension_height-2);
+            minkowski(){
+                hull(){
+                    translate([wall[0]-2,wall[1]-2,-2])cylinder(r1=tension_height-2,r2=0,h=tension_height-2);
+                    translate([wall[0]-2,wall[1]+2+area[1],-2])cylinder(r1=tension_height-2,r2=0,h=tension_height-2);
+                    translate([wall[0]+2+area[0],wall[1]-2,-2])cylinder(r1=tension_height-2,r2=0,h=tension_height-2);
+                    translate([wall[0]+2+area[0],wall[1]+2+area[1],-2])cylinder(r1=tension_height-2,r2=0,h=tension_height-2);
+                }
+                sphere(r=2,$fn=20);
+            }
+            for(i=[0:5])translate([wall[0]/2-1+(area[0]+wall[0]+2)*i/5,0,0]){
+                translate([0,wall[1]/2-1,0]){
+                    translate([0,0,3])polyCylinder(r=3,h=h);
+                    translate([0,0,-1])polyCylinder(r=1.5,h=h);
+                }
+                translate([0,wall[1]*3/2+area[1]+1,0]){
+                    translate([0,0,3])polyCylinder(r=3,h=h);
+                    translate([0,0,-1])polyCylinder(r=1.5,h=h);
+                }
+            }
+            for(i=[0:4])translate([0,wall[1]/2-1+(area[1]+wall[1]+2)*i/4,0]){
+                translate([wall[0]/2-1,0,0]){
+                    translate([0,0,3])polyCylinder(r=3,h=h);
+                    translate([0,0,-1])polyCylinder(r=1.5,h=h);
+                }
+                translate([wall[0]*3/2+area[0]+1,0,0]){
+                    translate([0,0,3])polyCylinder(r=3,h=h);
+                    translate([0,0,-1])polyCylinder(r=1.5,h=h);
+                }
             }
         }
     }
@@ -337,12 +372,12 @@ module z_arm(){
 }
 
 
-module vat_subasm(wall=[12,12]){
+module vat_subasm(wall=[12,12],lower_h=7,upper_h=20){
     translate([0,area[1]/2-vat_loc[1],foot_length+plate_thickness*2+base_height])
     union()
     {
-        vat_lower(wall=wall);
-        translate([0,0,11])vat_upper(wall=wall);
+        vat_lower(wall=wall,h=lower_h);
+        translate([0,0,lower_h])vat_upper(wall=wall,h=rail_gap-2-lower_h);
     }
 }
 
