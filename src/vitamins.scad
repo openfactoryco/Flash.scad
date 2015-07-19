@@ -137,6 +137,13 @@ module rail_subasm(length=200){
     rail_car(move=length);
 }
 
+module power_supply(dims=[78,110,36]){
+    translate([-base_radius,-base_radius+30,foot_length+plate_thickness])
+    color("silver"){
+        cube(dims);
+    
+    }
+}
 
 
 module rambo_mini(diff=false){
@@ -162,7 +169,7 @@ module rambo_mini(diff=false){
 
 module build_plate(){
     color("silver"){
-        translate([-platform_size[0]/2,area[0]/2-platform_size[0]/2-vat_loc[1]/2,base_height+plate_thickness*2+foot_length])cube(platform_size);
+        translate([-platform_size[0]/2,-platform_size[1]/2,0])cube(platform_size);
     }
 }
 

@@ -8,11 +8,11 @@ TODO
 
 - mirror mount - 1
 - fan mount - 1
-- vat - 3
+- vat - 2
+- vat mount - 2
 - z arm - 3
 - z shoe - 2
 - build plate - 1
-- extrusion cap - 1
 - extrusion mount - 1
 TCB
 */
@@ -49,19 +49,17 @@ vat_stepper_gap = 20-vat_loc[1];
 stepper_obj = object(stepper_type);
 stepper_loc = [-stepper_obj[WIDTH]/2,-stepper_obj[WIDTH]/2-vat_stepper_gap,base_height-stepper_obj[LENGTH]+plate_thickness+foot_length];
 
-extrusion_stepper_gap = stepper_obj[WIDTH] + 20;
-
 module assembly(){
     //top_plate();
     bottom_plate();
     base();
     base_side();
     extrusion_subasm();
+    vat_subasm();
     acer_h6510bd();
     stepper_subasm();
     rambo_mini();
-    vat_lower();
-    build_plate();
+    build_tray_subasm();
     amber_lid(); // put at end so transparency works.
 }
 
@@ -70,3 +68,5 @@ assembly();
 //rambo_mini();
 //rail_subasm();
 //extrusion_subasm();
+//vat_subasm();
+//build_tray_subasm();

@@ -31,34 +31,35 @@ module base_posts(distance, angs, radius, shift, height, screw_depth=10, screw_r
 }
 
 
-module base(wall=3,diff=false){
+module base(wall=4,diff=false){
     $fn = 200;
     difference(){
         translate([0,0,plate_thickness+foot_length])
         color("blue")
         union(){
             if(diff){
-                base_posts(base_radius, [140,170,210,240,270,300,330], wall=wall,2, height=base_height,diff=true);
+                base_posts(base_radius, [140,170,210,240,270,300,330], 4,2, height=base_height,diff=true);
             }
             else {
                 cutTube(inner=base_radius-wall,outer=base_radius,h=base_height,start=-15,finish=130,round=true);
                 base_posts(base_radius, [140,170,210,240,270,300,330], 4,2, base_height,diff=false);
-            }
-            hull(){
-                translate([4,-89,base_height])
-                    rotate([-90,0,35])
-                        translate([0,0,-3])
-                        cube([10,base_height,1]);
-                rotate([0,0,-90])translate([base_radius-wall,0,0])cube([wall,0.001,base_height]);
-                rotate([0,0,-80])translate([base_radius-wall,0,0])cube([wall,0.001,base_height]);
-            }
-            hull(){
-                translate([4,-89,base_height])
-                    rotate([-90,0,35])
-                        translate([95,0,-3])
-                        cube([10,base_height,1]);
-                rotate([0,0,-20])translate([base_radius-wall,0,0])cube([wall,0.001,base_height]);
-                rotate([0,0,-30])translate([base_radius-wall,0,0])cube([wall,0.001,base_height]);
+                //electronics mounts
+                hull(){
+                    translate([4,-89,base_height])
+                        rotate([-90,0,35])
+                            translate([0,0,-3])
+                            cube([10,base_height,1]);
+                    rotate([0,0,-90])translate([base_radius-wall,0,0])cube([wall,0.001,base_height]);
+                    rotate([0,0,-80])translate([base_radius-wall,0,0])cube([wall,0.001,base_height]);
+                }
+                hull(){
+                    translate([4,-89,base_height])
+                        rotate([-90,0,35])
+                            translate([95,0,-3])
+                            cube([10,base_height,1]);
+                    rotate([0,0,-20])translate([base_radius-wall,0,0])cube([wall,0.001,base_height]);
+                    rotate([0,0,-30])translate([base_radius-wall,0,0])cube([wall,0.001,base_height]);
+                }
             }
         }
         rambo_mini(true);
@@ -119,10 +120,34 @@ module bottom_plate(){
     $fn = 500;
     color("black")
     difference(){
-        translate(asm_loc)
-        hull()cutTube(inner=base_radius-5,outer=base_radius,h=plate_thickness,start=50,finish=130,round=true);
+        union(){
+            translate(asm_loc)
+                hull()cutTube(inner=base_radius-5,outer=base_radius,h=plate_thickness,start=50,finish=130,round=true);
+            
+        }
         base_side(diff=true);
         base(diff=true);
+    }
+}
+
+module platform_attachment(h=3,r=5,sphere_r=11){
+    color("gray")
+    difference(){
+        union(){
+            hull(){
+                translate([platform_size[0]/2-r,platform_size[1]/2-r,0])
+                    cylinder(r=5,h=h);
+                translate([-platform_size[0]/2+r,platform_size[1]/2-r,0])
+                    cylinder(r=5,h=h);
+                translate([-platform_size[0]/2+r,-platform_size[1]/2+r,0])
+                    cylinder(r=5,h=h);
+                translate([platform_size[0]/2-r,-platform_size[1]/2+r,0])
+                    cylinder(r=5,h=h);
+                translate([0,0,h])
+                    cylinder(r1=platform_size[1]/2,r2=0,h=h);
+            }
+            translate([0,0,sphere_r])sphere(r=sphere_r);
+        }
     }
 }
 
@@ -140,17 +165,28 @@ module amber_lid(){
     }
 }
 
-module vat_lower(r=5,window_r=2,h=10){
+module vat_lower(r=5,size=area,wall=[25,15],tension_height=5, window_r=2,h=10){
     color("orange"){
-        minkowski(){
-            difference(){
-                translate([-area[0]/2,0,1+base_height+plate_thickness*2+foot_length])cube([area[0]+r*2,area[1]+r*2,h-2]);
+        difference(){
+            union(){
+                minkowski(){
+                    translate([r,r,0])cube([area[0]+wall[0]*2-r*2,area[1]+wall[1]*2-r*2,h-1]);
+                    cylinder(r=r, h=1);
+                }
+                minkowski(){
+                    hull(){
+                        translate([wall[0]-2,wall[1]-2,h-2])cylinder(r1=tension_height-2,r2=0,h=tension_height-2);
+                        translate([wall[0]-2,wall[1]+2+area[1],h-2])cylinder(r1=tension_height-2,r2=0,h=tension_height-2);
+                        translate([wall[0]+2+area[0],wall[1]-2,h-2])cylinder(r1=tension_height-2,r2=0,h=tension_height-2);
+                        translate([wall[0]+2+area[0],wall[1]+2+area[1],h-2])cylinder(r1=tension_height-2,r2=0,h=tension_height-2);
+                    }
+                    sphere(r=2,$fn=20);
+                }
+            }
             minkowski(){
-                projector_throw(diff=true);
-                sphere(r=2, $fn=60);
+                translate([wall[0],wall[1],0])cube([area[0],area[1],h]);
+                translate([0,0,-0.5])cylinder(r=2,h=10);
             }
-            }
-            cylinder(r=r,h=1);
         }
     }
 }
@@ -165,6 +201,8 @@ module extrusion_cap(){
         }
         translate([12.5,10,-1])polyCylinder(r=2.5,h=12);
         translate([12.5,10,-1])polyCylinder(r=4.5,h=7);
+        translate([7.5,41,5])rotate([90,0,0])polyCylinder(r=1,h=12);
+        translate([25-7.5,41,5])rotate([90,0,0])polyCylinder(r=1,h=12);
     }
 }
 
@@ -180,8 +218,15 @@ module extrusion_guard(){
     }
 }
 
+module vat_subasm(){
+    translate([0,area[0]/2-vat_loc[0],0])
+    translate([-area[0]/2-25,-area[1]/2-15,foot_length+plate_thickness*2+base_height]){
+        vat_lower();
+    }
+}
+
 module extrusion_subasm(){
-    translate([10,-10-vat_stepper_gap,foot_length+plate_thickness]){
+    translate([0,-vat_stepper_gap,foot_length+plate_thickness]){
         translate([0,0,extrusion_length])extrusion_cap();
         extrusion();
         translate([0,10,base_height+plate_thickness+rail_gap])
@@ -189,4 +234,11 @@ module extrusion_subasm(){
         translate([0,0,plate_thickness+base_height])extrusion_guard();
     }
     acme_nut();
+}
+
+module build_tray_subasm(){
+    translate([0,0,foot_length+plate_thickness*2+base_height]){
+        translate([0,0,platform_size[2]])platform_attachment();
+        build_plate();
+    }
 }
