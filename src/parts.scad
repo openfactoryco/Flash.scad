@@ -6,7 +6,7 @@ module base_posts(distance, angs, radius, shift, height, screw_depth=10, screw_r
         if(diff){
             translate([distance-radius-shift,0,-11])polyCylinder(r=3,h=8);
             translate([distance-radius-shift,0,-11])polyCylinder(r=2,h=12);
-            translate([distance-radius-shift,0,height+3])polyCylinder(r=3,h=8);
+            translate([distance-radius-shift,0,height+3])polyCylinder(r=3,h=20);
             translate([distance-radius-shift,0,height-1])polyCylinder(r=2,h=12);
         }
         else {
@@ -32,7 +32,7 @@ module base_posts(distance, angs, radius, shift, height, screw_depth=10, screw_r
 
 
 module base(wall=4,diff=false){
-    $fn = 200;
+    $fn = 100;
     difference(){
         translate([0,0,plate_thickness+foot_length])
         color("blue")
@@ -67,7 +67,7 @@ module base(wall=4,diff=false){
 }
 
 module base_side(diff=false){
-    $fn = 200;
+    $fn =  100;
     r=4;
     post_radius = 4;
     post_shift = 2;
@@ -95,15 +95,44 @@ module base_side(diff=false){
 }
 
 
-module top_plate(){
+module top_plate(vat_wall=[12,12]){
     wall = 5;
     asm_loc = [0,0,base_height+foot_length+plate_thickness];
-    $fn = 200;
+    $fn = 100;
 
-    color("black"){
+    color("grey"){
         difference(){
-            translate(asm_loc)cylinder(r=base_radius, h=plate_thickness);
-            extrusion(diff=true);
+            translate(asm_loc)
+            difference(){
+                union(){
+                    hull(){
+                        hull()
+                            cutTube(inner=base_radius-5,outer=base_radius,h=plate_thickness,start=65,finish=115,round=true);
+                        translate([0,0,plate_thickness-1])
+                            cylinder(r=base_radius, h=1);
+                    }
+                    minkowski(){
+                        difference(){
+                            translate([0,0,plate_thickness])cylinder(r1=base_radius-lid_thickness-3,
+                                     r2=base_radius-lid_thickness*2-3,
+                                     h=lid_thickness);
+                             translate([0,0,plate_thickness-1])
+                                cylinder(r=base_radius-lid_thickness*2-3,
+                                         h=lid_thickness+2);
+                             }
+                         sphere(r=3, $fn=10);
+                     }
+                }
+                translate([40,-40,0])rotate([0,0,0])fan_diff();
+                translate([-area[0]/2-vat_wall[0],-vat_wall[1],plate_thickness])cube([area[0]+vat_wall[0]*2,area[1]+vat_wall[1]*2,10]);
+                minkowski(){
+                    translate([-area[0]/2,0,-1])
+                        cube([area[0],area[1],10]);
+                    cylinder(r=2, h=2);
+                }
+                //extrusion
+                translate([-10,-20-24,-1])cube([20,20,plate_thickness+2]);
+            }
             stepper_subasm(diff=true);
             base_side(diff=true);
             base(diff=true);
@@ -114,7 +143,7 @@ module top_plate(){
 module bottom_plate(){
     asm_loc = [0,0,foot_length];
     $fn = 500;
-    color("black")
+    color("grey")
     difference(){
         union(){
             translate(asm_loc)
@@ -126,7 +155,7 @@ module bottom_plate(){
     }
 }
 
-module platform_attachment(h=3,r=5,sphere_r=11){
+module platform_attachment(h=3.5,r=5,sphere_r=11){
     color("gray")
     difference(){
         union(){
@@ -144,6 +173,12 @@ module platform_attachment(h=3,r=5,sphere_r=11){
             }
             translate([0,0,sphere_r])sphere(r=sphere_r);
         }
+        for(i=[-1,1]) for(j=[-1,1])
+            translate([i*platform_size[0]/2-i*r-i*5,j*platform_size[1]/2-j*r-j*5,-1]){
+                polyCylinder(r=1.5,h=h+2);
+                translate([0,0,4])
+                    polyCylinder(r=3,h=h+2);
+                }
     }
 }
 
@@ -152,7 +187,8 @@ module amber_lid(){
     asm_loc = [0,0,base_height+plate_thickness*2+foot_length];
     $fn = 200;
     color("DarkOrange", 0.5){
-        translate(asm_loc)difference(){
+        translate(asm_loc)
+        difference(){
             cylinder(r=base_radius, h=lid_height);
             r1 = base_radius - lid_thickness;
             h1 = base_height - lid_thickness;
@@ -188,7 +224,7 @@ module vat_lower(r=5,size=area,wall=[15,10],tension_height=5, window_r=2,h=10){
     }
 }
 
-module vat_upper(r=5,size=area,wall=[15,10],tension_height=5, window_r=2,h=10){
+module vat_upper(r=5,size=area,wall=[15,10],tension_height=5, window_r=2,h=17){
     translate([-area[0]/2-wall[0],-area[1]/2-wall[1],0])
     color("orange"){
         difference(){
@@ -219,29 +255,56 @@ module vat_upper(r=5,size=area,wall=[15,10],tension_height=5, window_r=2,h=10){
 }
 
 module extrusion_cap(){
-    translate([12.5,-10,10])
+    translate([12.5,-10,15])
     rotate([0,180,0])
     color("orange")
     difference(){
         union(){
-            cube([25,40,10]);
+            cube([25,40,15]);
         }
-        translate([12.5,10,-1])polyCylinder(r=2.5,h=12);
+        translate([12.5,10,-1])polyCylinder(r=2.5,h=15);
         translate([12.5,10,-1])polyCylinder(r=4.5,h=7);
-        translate([7.5,41,5])rotate([90,0,0])polyCylinder(r=1,h=12);
-        translate([25-7.5,41,5])rotate([90,0,0])polyCylinder(r=1,h=12);
+        translate([7.5,41,7])rotate([90,0,0])polyCylinder(r=1,h=12);
+        translate([25-7.5,41,7])rotate([90,0,0])polyCylinder(r=1,h=12);
     }
 }
 
 module extrusion_guard(){
     module guard_half(){
         translate([9,1,0])cube([3,2,rail_gap]);
-        translate([11,1,0])cube([2,18,rail_gap]);
-        translate([0,10,0])cube([12,9,rail_gap]);
+        translate([10.5,1,0])cube([1.5,18,rail_gap]);
+        translate([0,10,0])cube([12,12,rail_gap]);
+        translate([0,10,rail_gap-2])cube([12,25,2]);
     }
     color("orange"){
         mirror([1,0,0])guard_half();
         guard_half();
+    }
+}
+
+module z_shoe(sphere_r=11){
+    gap = area[1]/2-15;
+    split = 4;
+    split_height = 20;
+    translate([-34/2,-gap,0])
+    color("grey"){
+        difference(){
+            union(){
+                hull(){
+                    cube([34,gap-3,57]);
+                    translate([34/2,gap,0])cylinder(r=area[1]/2-15,h=57);
+                }
+                translate([34/2,0,20])rotate([-90,0,0])cylinder(r=8, h=gap*2);
+                translate([-4+34/2,0,15.5+32])rotate([-90,0,0])cylinder(r=8, h=gap*2);
+                translate([6,0,13])rotate([-90,0,0])cylinder(r=6, h=gap*2);
+                translate([34-6,0,13])rotate([-90,0,0])cylinder(r=6, h=gap*2);
+            }
+            translate([-1,gap-split/2,-1])cube([36,split,split_height]);
+            translate([34/2,-1,20])rotate([-90,0,0])polyCylinder(r=2, h=gap*2+2);
+            translate([-4+34/2,-1,15.5+32])rotate([-90,0,0])polyCylinder(r=2, h=gap*2+2);
+            translate([6,-1,13])rotate([-90,0,0])polyCylinder(r=2, h=gap*2+2);
+            translate([34-6,-1,13])rotate([-90,0,0])polyCylinder(r=2, h=gap*2+2);
+        }
     }
 }
 
@@ -264,10 +327,10 @@ module z_arm(){
                 translate([4+x_i-34/2,11,15.5+z_i])rotate([90,0,0])cylinder(r=2, h=16);
                 translate([4+x_i-34/2,3,15.5+z_i])rotate([-90,0,0])cylinder(r=3.75, h=13);
             }
-            translate([2,-1,15.5])rotate([-90,0,0])cylinder(r=2, h=17);
-            translate([-2,-1,15.5+26])rotate([-90,0,0])cylinder(r=2, h=17);
-            translate([2,-1,15.5])rotate([-90,0,0])cylinder(r=4, h=4.5, $fn=6);
-            translate([-2,-1,15.5+26])rotate([-90,0,0])cylinder(r=4, h=4.5,$fn=6);
+            translate([0,-1,20])rotate([-90,0,0])cylinder(r=2, h=17);
+            translate([-4,-1,15.5+32])rotate([-90,0,0])cylinder(r=2, h=17);
+            translate([0,-1,20])rotate([-90,0,0])cylinder(r=4, h=4.5, $fn=6);
+            translate([-4,-1,15.5+32])rotate([-90,0,0])cylinder(r=4, h=4.5,$fn=6);
         }
         acme_nut(diff=true);
     }
@@ -296,8 +359,9 @@ module extrusion_subasm(){
 }
 
 module build_tray_subasm(){
-    translate([0,area[1]/2,foot_length+plate_thickness*2+base_height]){
+    translate([0,area[1]/2,foot_length+plate_thickness*2+base_height+10+(200-57)*$t]){
         translate([0,0,platform_size[2]])platform_attachment();
         build_plate();
+        translate([0,0,rail_gap-10])z_shoe();
     }
 }

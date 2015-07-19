@@ -7,11 +7,7 @@ include <parts.scad>
 TODO
 
 - mirror mount - 1
-- fan mount - 1
 - vat - 2
-- vat mount - 2
-- z shoe - 2
-- build plate - 1
 - extrusion mount - 1
 TCB
 */
@@ -20,6 +16,8 @@ TCB
 area = [60*16/9,60];
 
 platform_size = [3*25.4, 45,0.5*25.4];
+
+mirror_size = [90,50,6];
 
 foot_length = 5;
 
@@ -51,7 +49,7 @@ stepper_loc = [-stepper_obj[WIDTH]/2-10,-34,base_height-stepper_obj[LENGTH]+plat
 
 module assembly(){
     //top_plate();
-    bottom_plate();
+    translate([0,0,0.1])bottom_plate();
     base();
     base_side();
     extrusion_subasm();
@@ -60,9 +58,10 @@ module assembly(){
     stepper_subasm();
     rambo_mini();
     build_tray_subasm();
-    //amber_lid(); // put at end so transparency works.
+    amber_lid(); // put at end so transparency works.
 }
 
+//fan_diff();
 assembly();
 //z_arm();
 //vat_subasm();

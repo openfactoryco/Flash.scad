@@ -42,7 +42,7 @@ module acme_nut(move_length=200-57,diff=false){
             for(i=[1:3]){
                 rotate([0,0,120*i])translate([19.05/2,0,-20])polyCylinder(r=1,h=70);
             }
-            translate([0,0,-50])polyCylinder(r=5,h=100);
+            translate([0,0,-50])polyCylinder(r=12.7/2,h=100);
         }
     }
 }
@@ -164,6 +164,14 @@ module rambo_mini(diff=false){
         if(!diff)
             for(x_i=[0,95]) for(y_i=[0,61])
                 translate([5+x_i,5+y_i,-1])cylinder(r=2, h=5);
+    }
+}
+
+module fan_diff(){
+    union(){
+        cylinder(r=25, h = 50,center=true);
+        for(i=[0:3])
+            rotate([0,0,90*i])translate([20,20,0])polyCylinder(r=1, h=50,center=true);
     }
 }
 
