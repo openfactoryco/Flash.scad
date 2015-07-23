@@ -325,20 +325,29 @@ module z_shoe(sphere_r=11){
     color("grey"){
         difference(){
             union(){
-                hull(){
-                    cube([34,gap-3,57]);
-                    translate([34/2,gap,0])cylinder(r=area[1]/2-15,h=57);
+                difference(){
+                    union(){
+                        hull(){
+                            translate([0,0,0])cube([34,gap-3,57]);
+                            translate([34/2,gap,0])cylinder(r=area[1]/2-15,h=57);
+                        }
+                        translate([-4+34/2,0,15.5+32])rotate([-90,0,0])cylinder(r=8, h=gap*2);
+                        hull(){
+                            translate([34/2,0,20])rotate([-90,0,0])cylinder(r=8, h=gap*2);
+                            translate([6,0,13])rotate([-90,0,0])cylinder(r=6, h=gap*2);
+                            translate([34-6,0,13])rotate([-90,0,0])cylinder(r=6, h=gap*2);
+                        }
+                    }
+                    translate([-1,gap-split/2,-1])cube([36,split,split_height]);
+                    translate([34/2,gap,-rail_gap+10+platform_size[2]+sphere_r])sphere(r=sphere_r+0.1);
                 }
-                translate([34/2,0,20])rotate([-90,0,0])cylinder(r=8, h=gap*2);
-                translate([-4+34/2,0,15.5+32])rotate([-90,0,0])cylinder(r=8, h=gap*2);
-                translate([6,0,13])rotate([-90,0,0])cylinder(r=6, h=gap*2);
-                translate([34-6,0,13])rotate([-90,0,0])cylinder(r=6, h=gap*2);
             }
-            translate([-1,gap-split/2,-1])cube([36,split,split_height]);
             translate([34/2,-1,20])rotate([-90,0,0])polyCylinder(r=2, h=gap*2+2);
             translate([-4+34/2,-1,15.5+32])rotate([-90,0,0])polyCylinder(r=2, h=gap*2+2);
             translate([6,-1,13])rotate([-90,0,0])polyCylinder(r=2, h=gap*2+2);
             translate([34-6,-1,13])rotate([-90,0,0])polyCylinder(r=2, h=gap*2+2);
+            translate([6,-1,13])rotate([-90,0,0])cylinder(r=4, h=6, $fn=6);
+            translate([34-6,-1,13])rotate([-90,0,0])cylinder(r=4, h=6, $fn=6);
         }
     }
 }
